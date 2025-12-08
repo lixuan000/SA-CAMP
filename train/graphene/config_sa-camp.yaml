@@ -1,0 +1,89 @@
+data:
+  atomic_number:
+  - 6
+  r_cut: 6.0
+  test_batch_size: 8
+  testset_filename: 
+  train_batch_size: 8
+  trainset_filename: 
+  val_batch_size: 8
+  valset_filename: 
+default_dtype: float32
+ema:
+  beta: 0.999
+  include_online_model: false
+  power: 0.6667
+  update_after_step: 1000
+  update_every: 1
+loss:
+  energy_ratio: 1.0
+  forces_ratio: 1.0
+  normalize: true
+lr_scheduler:
+  type: cosine
+  T_max: 100
+  min_lr: 1e-6
+  warmup_steps: 1000
+metrics:
+  normalize: true
+  type: mae
+  validation_start_epoch: 50
+model:
+  max_chebyshev_degree: 8
+  max_u: 48
+  max_v: 3
+  num_average_neigh: auto
+  num_layers: 3
+  output_mlp_hidden_layers:
+  - 48
+  - 48
+  radial_mlp_hidden_layers:
+  - 48
+  - 48
+  hidden_dim: 128
+  num_heads: 4
+  dropout: 0.1
+  ffn_dim: 256
+  use_transformer_after: 0
+optimizer:
+  class_path: torch.optim.AdamW
+  init_args:
+    lr: 0.001
+    weight_decay: 0.0001
+    betas: [0.9, 0.999]
+    eps: 0.00000001
+    amsgrad: true
+restore_checkpoint: null
+seed_everything: 35
+trainer:
+  accelerator: gpu
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelSummary
+    init_args:
+      max_depth: -1
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: null
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      mode: min
+      monitor: val_ema/mae_e
+      save_top_k: 3
+      verbose: false
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      mode: min
+      monitor: val_ema/mae_e
+      patience: 200
+      verbose: true
+  check_val_every_n_epoch: 1
+  detect_anomaly: false
+  gradient_clip_val: 100.0
+  inference_mode: false
+  log_every_n_steps: 50
+  logger:
+    class_path:
+    init_args:
+      project:
+  max_epochs: 1000
+  num_nodes: 1
